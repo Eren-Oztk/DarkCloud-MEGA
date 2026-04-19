@@ -49,9 +49,9 @@
  * #define yerine const flash string kullanın.
  * Aşağıdaki değerler yalnızca örnek amaçlıdır.
  */
-const char* WIFI_SSID     = "DarkCloud_MEGA";   // SoftAP ağ adı
-const char* WIFI_PASSWORD = "darkcloud2025";    // SoftAP şifresi (min 8 karakter – WPA2)
-const char* ADMIN_TOKEN   = "gizli_admin_tok";  // /clearChat vb. için basit token
+const char* WIFI_SSID     = "PASS";   // SoftAP ağ adı
+const char* WIFI_PASSWORD = "PASS";    // SoftAP şifresi (min 8 karakter – WPA2)
+const char* ADMIN_TOKEN   = "PASS";  // /clearChat vb. için basit token
 
 // ─── HTTP SUNUCU ────────────────────────────────────────────────
 WebServer server(80);   // 80 numaralı port'ta HTTP sunucu
