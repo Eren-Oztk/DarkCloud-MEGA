@@ -2,6 +2,8 @@
 
 **Deneyap Kart (ESP32-S3) üzerinde çalışan yerel ağ mesajlaşma ve dosya paylaşım sistemi.**
 
+[![Live Demo](https://img.shields.io/badge/🌐_Demo-GitHub_Pages-blue)](https://eren-oztk.github.io/DarkCloud-MEGA)
+
 WiFi SoftAP modunda kendi ağını oluşturur; bağlanan kullanıcılar tarayıcı üzerinden WhatsApp benzeri bir arayüzle mesajlaşabilir ve dosya paylaşabilir.
 
 ---
