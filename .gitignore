@@ -1,0 +1,54 @@
+# ─── Arduino Build Artifacts ───────────────────────────────────
+build/
+.pio/
+.pioenvs/
+*.elf
+*.bin
+*.hex
+*.map
+
+# ─── Arduino IDE ────────────────────────────────────────────────
+*.bak
+*.tmp
+*.log
+
+# ─── Secrets & Credentials ──────────────────────────────────────
+# WiFi şifresi, admin token vb. içeren dosyalar asla commit'e girmesin.
+secrets.h
+credentials.h
+config_secret.h
+*.env
+.env*
+
+# ─── IDE & OS Artifacts ─────────────────────────────────────────
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains / CLion
+.idea/
+cmake-build-*/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ─── SD Kart Log Dosyaları (Hassas Olabilir) ────────────────────
+chat_log.txt
+users.txt
+dm_log.txt
+rooms.txt
