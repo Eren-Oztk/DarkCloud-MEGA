@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DarkCloud MEGA — Offline Mesh Messenger</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --bg: #080c10;
+    --surface: #0d1117;
+    --surface2: #161b22;
+    --border: #21262d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --warn: #f78166;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --cloud: #c9d1d9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* starfield */
+  #stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; position: relative; z-index: 1; }
+
+  /* NAV */
+  nav {
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    position: sticky; top: 0;
+    background: rgba(8,12,16,0.9);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+  nav .inner {
+    max-width: 900px; margin: 0 auto; padding: 0 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px; color: var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  nav .logo span { color: var(--muted); }
+  nav .links { display: flex; gap: 1.5rem; }
+  nav .links a {
+    font-size: 13px; color: var(--muted); text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    transition: color .2s;
+  }
+  nav .links a:hover { color: var(--text); }
+
+  /* HERO */
+  .hero {
+    padding: 6rem 0 4rem;
+    text-align: center;
+  }
+  .hero .badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    border: 1px solid rgba(63,185,80,0.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 1rem;
+  }
+  .hero h1 .dim { color: var(--muted); }
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+    font-weight: 400;
+  }
+  .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    padding: 10px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all .2s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 700;
+  }
+  .btn-primary:hover { background: #79b8ff; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* STATS */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 4rem 0;
+  }
+  .stat {
+    background: var(--surface);
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .stat .num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+  }
+  .stat .lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* FEATURES */
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+  }
+  .section-sub {
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+    font-size: 1rem;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-bottom: 5rem;
+  }
+  .feature {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    transition: border-color .2s;
+  }
+  .feature:hover { border-color: var(--accent); }
+  .feature .icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .feature h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .feature p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* SIMULATION */
+  .sim-section { margin-bottom: 5rem; }
+  .sim-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .sim-bar {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sim-bar .title {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .sim-bar .status {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+  }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent2);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; } 50% { opacity:.3; }
+  }
+
+  .sim-body {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 420px;
+  }
+  .sim-sidebar {
+    border-right: 1px solid var(--border);
+    padding: 0.75rem 0;
+  }
+  .sim-sidebar .section-header {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    padding: 0.25rem 1rem 0.5rem;
+    text-transform: uppercase;
+  }
+  .user-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .user-item:hover, .user-item.active { background: var(--surface2); }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .user-status {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+  }
+  .user-status.online { color: var(--accent2); }
+
+  .sim-chat {
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .chat-header .name { font-size: 14px; font-weight: 600; }
+  .chat-header .meta { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  .messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 280px;
+  }
+  .msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 70%;
+  }
+  .msg.sent { align-self: flex-end; align-items: flex-end; }
+  .msg.recv { align-self: flex-start; }
+  .msg .bubble {
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    font-family: 'Space Mono', monospace;
+  }
+  .msg.sent .bubble {
+    background: var(--accent);
+    color: #0d1117;
+    border-bottom-right-radius: 3px;
+  }
+  .msg.recv .bubble {
+    background: var(--surface2);
+    color: var(--text);
+    border-bottom-left-radius: 3px;
+  }
+  .msg .time {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin-top: 3px;
+    padding: 0 4px;
+  }
+
+  .chat-input {
+    border-top: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .chat-input input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .chat-input input:focus { border-color: var(--accent); }
+  .chat-input input::placeholder { color: var(--muted); }
+  .send-btn {
+    background: var(--accent);
+    color: #0d1117;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .send-btn:hover { background: #79b8ff; }
+
+  /* HOW IT WORKS */
+  .how-section { margin-bottom: 5rem; }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    position: relative;
+  }
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  .step h3 { font-size: 14px; font-weight: 600; margin-bottom: 0.5rem; }
+  .step p { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; line-height: 1.6; }
+
+  /* HARDWARE */
+  .hw-section { margin-bottom: 5rem; }
+  .hw-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .hw-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+  .hw-item .hw-icon { font-size: 1.25rem; margin-bottom: 0.5rem; }
+  .hw-item .hw-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .hw-item .hw-desc { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 0;
+    text-align: center;
+  }
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .sim-body { grid-template-columns: 1fr; }
+    .sim-sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+    .stats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<nav>
+  <div class="inner">
+    <div class="logo">☁ <span>DarkCloud</span> MEGA <span>v6.1</span></div>
+    <div class="links">
+      <a href="#demo">Demo</a>
+      <a href="#features">Özellikler</a>
+      <a href="https://github.com/Eren-Oztk/DarkCloud-MEGA">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <section class="hero">
+    <div class="badge">● ESP32 · OFFLINE · NO INTERNET REQUIRED</div>
+    <h1>DarkCloud<br><span class="dim">MEGA</span></h1>
+    <p>İnternet bağlantısı olmadan çalışan yerel Wi-Fi ağ mesajlaşma sistemi. ESP32 kendi ağını kurar, bağlanan herkes tarayıcıdan mesajlaşır.</p>
+    <div class="hero-btns">
+      <a href="#demo" class="btn btn-primary">Canlı Demo →</a>
+      <a href="https://github.com/Eren-Oztk/DarkCloud-MEGA" class="btn btn-ghost">GitHub'da Gör</a>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="num">0</div>
+      <div class="lbl">İnternet bağlantısı</div>
+    </div>
+    <div class="stat">
+      <div class="num">∞</div>
+      <div class="lbl">Offline mesajlaşma</div>
+    </div>
+    <div class="stat">
+      <div class="num">ESP32</div>
+      <div class="lbl">Tek kart yeterli</div>
+    </div>
+  </div>
+
+  <section id="features" style="margin-bottom:5rem;">
+    <div class="section-label">// özellikler</div>
+    <div class="section-title">Ne yapabilir?</div>
+    <p class="section-sub">Tarayıcı tabanlı, sunucu gerektirmeyen tam özellikli bir messenger.</p>
+    <div class="features">
+      <div class="feature">
+        <div class="icon">💬</div>
+        <h3>Gerçek Zamanlı Mesajlaşma</h3>
+        <p>WhatsApp tarzı arayüz. Online/offline/yazıyor durumu, emoji seçici, toast bildirimi.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📁</div>
+        <h3>Dosya Paylaşımı</h3>
+        <p>SD kart üzerinden dosya yükleme ve indirme. İnternet olmadan veri transferi.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🔐</div>
+        <h3>XOR Şifreleme</h3>
+        <p>SD'ye yazılan mesajlar şifreli saklanır. NVS ile şifreleme durumu kalıcı.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🎨</div>
+        <h3>Kullanıcı Profilleri</h3>
+        <p>Rastgele renk ve emoji avatar. Her kullanıcı benzersiz görünür.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">⚙️</div>
+        <h3>Admin Paneli</h3>
+        <p>/clearChat, /setEncryption endpoint'leri. Uzaktan yönetim.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📶</div>
+        <h3>SoftAP Modu</h3>
+        <p>ESP32 kendi Wi-Fi ağını oluşturur. Router, modem, internet gerekmez.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo" class="sim-section">
+    <div class="section-label">// interaktif demo</div>
+    <div class="section-title">Deneyin</div>
+    <p class="section-sub">Gerçek arayüzün simülasyonu. Mesaj yazıp gönderin.</p>
+
+    <div class="sim-wrapper">
+      <div class="sim-bar">
+        <span class="title">DarkCloud MEGA — 192.168.4.1</span>
+        <span class="status"><span class="dot"></span>3 kullanıcı bağlı</span>
+      </div>
+      <div class="sim-body">
+        <div class="sim-sidebar">
+          <div class="section-header">Kullanıcılar</div>
+          <div class="user-item active" onclick="selectUser(this,'Zara','#58a6ff','Z')">
+            <div class="avatar" style="background:#1f3a5f;color:#58a6ff">Z</div>
+            <div class="user-info">
+              <div class="user-name">Zara</div>
+              <div class="user-status online">● online</div>
+            </div>
+          </div>
+          <div class="user-item" onclick="selectUser(this,'Raven','#3fb950','R')">
+            <div class="avatar" style="background:#1a3a20;color:#3fb950">R</div>
+            <div class="user-info">
+              <div class="user-name">Raven</div>
+              <div class="user-status online">● online</div>
+            </div>
+          </div>
+          <div class="user-item" onclick="selectUser(this,'Nova','#f78166','N')">
+            <div class="avatar" style="background:#3a1f1a;color:#f78166">N</div>
+            <div class="user-info">
+              <div class="user-name">Nova</div>
+              <div class="user-status">● away</div>
+            </div>
+          </div>
+          <div class="user-item" style="margin-top:8px;opacity:.5">
+            <div class="avatar" style="background:#161b22;color:#7d8590;border:1px dashed #21262d">+</div>
+            <div class="user-info">
+              <div class="user-name" style="color:#7d8590;font-size:12px">Sen bağlan</div>
+              <div class="user-status">DarkCloud-MEGA</div>
+            </div>
+          </div>
+        </div>
+        <div class="sim-chat">
+          <div class="chat-header">
+            <div class="avatar" id="chat-avatar" style="width:28px;height:28px;font-size:11px;background:#1f3a5f;color:#58a6ff">Z</div>
+            <div>
+              <div class="name" id="chat-name">Zara</div>
+              <div class="meta">192.168.4.1 · encrypted</div>
+            </div>
+          </div>
+          <div class="messages" id="messages">
+            <div class="msg recv">
+              <div class="bubble">sistem aktif. bağlantı kuruldu 🟢</div>
+              <div class="time">Zara · 14:02</div>
+            </div>
+            <div class="msg sent">
+              <div class="bubble">darkcloud çalışıyor mu?</div>
+              <div class="time">Sen · 14:03</div>
+            </div>
+            <div class="msg recv">
+              <div class="bubble">evet, wifi ağı kuruldu. internet yok, sadece esp32 var.</div>
+              <div class="time">Zara · 14:03</div>
+            </div>
+          </div>
+          <div class="chat-input">
+            <input type="text" id="msg-input" placeholder="Mesaj yaz..." onkeydown="if(event.key==='Enter')sendMsg()">
+            <button class="send-btn" onclick="sendMsg()">Gönder</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-section">
+    <div class="section-label">// nasıl çalışır</div>
+    <div class="section-title">Kurulum</div>
+    <p class="section-sub">4 adımda çalışır hale getir.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01 //</div>
+        <h3>Kodu İndir</h3>
+        <p>GitHub'dan .ino dosyasını indir. Arduino IDE'ye aç.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02 //</div>
+        <h3>Kütüphaneleri Kur</h3>
+        <p>ESPAsyncWebServer, ArduinoJson, U8g2 kütüphanelerini ekle.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03 //</div>
+        <h3>ESP32'ye Yükle</h3>
+        <p>Board: ESP32-S3. Upload et, seri monitörden IP'yi al.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04 //</div>
+        <h3>Bağlan & Yaz</h3>
+        <p>"DarkCloud-MEGA" ağına bağlan. 192.168.4.1'i aç. Mesajlaş.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="hw-section">
+    <div class="section-label">// donanım</div>
+    <div class="section-title">Ne lazım?</div>
+    <p class="section-sub">Minimum donanım, maksimum özellik.</p>
+    <div class="hw-grid">
+      <div class="hw-item">
+        <div class="hw-icon">🔴</div>
+        <div class="hw-name">Deneyap Kart</div>
+        <div class="hw-desc">ESP32-S3 tabanlı. Türkiye yapımı geliştirici kartı.</div>
+      </div>
+      <div class="hw-item">
+        <div class="hw-icon">📟</div>
+        <div class="hw-name">OLED Ekran</div>
+        <div class="hw-desc">128x64px. Ağ bilgilerini ve durumu gösterir.</div>
+      </div>
+      <div class="hw-item">
+        <div class="hw-icon">🎛️</div>
+        <div class="hw-name">Rotary Encoder</div>
+        <div class="hw-desc">Menü navigasyonu. Basit fiziksel kontrol.</div>
+      </div>
+      <div class="hw-item">
+        <div class="hw-icon">💾</div>
+        <div class="hw-name">SD Kart (opsiyonel)</div>
+        <div class="hw-desc">Mesaj geçmişi ve dosya paylaşımı için.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>Built by <a href="https://github.com/Eren-Oztk">Eren-Oztk</a> · <a href="https://github.com/Eren-Oztk/DarkCloud-MEGA">GitHub</a> · ESP32 + No Internet</p>
+</footer>
+
+<script>
+// Starfield
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 160; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.2,
+      o: Math.random() * 0.6 + 0.1,
+      s: Math.random() * 0.3 + 0.05
+    });
+  }
+}
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.o += (Math.random() - 0.5) * 0.04;
+    s.o = Math.max(0.05, Math.min(0.7, s.o));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200,210,230,${s.o})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+resize(); initStars(); drawStars();
+window.addEventListener('resize', () => { resize(); initStars(); });
+
+// Chat sim
+let currentUser = { name: 'Zara', color: '#58a6ff', letter: 'Z' };
+const replies = {
+  'Zara': ['anladım 👍', 'dosyayı SD karta kaydettim.', 'şifreleme aktif.', 'bağlantı güçlü, -60 dBm.', 'tamam, router yok yine de çalışıyor 😄'],
+  'Raven': ['sistem stabil.', 'ağda 3 cihaz var.', 'ok.', 'log temizlendi.', 'uptime: 4 saat 12 dk'],
+  'Nova': ['birazdan döneceğim.', '...', 'dosyayı aldım, teşekkürler.', 'sinyal zayıf burada.']
+};
+let replyIdx = { Zara:0, Raven:0, Nova:0 };
+
+function selectUser(el, name, color, letter) {
+  document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  currentUser = { name, color, letter };
+  document.getElementById('chat-name').textContent = name;
+  const av = document.getElementById('chat-avatar');
+  av.textContent = letter;
+  av.style.color = color;
+}
+
+function sendMsg() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const msgs = document.getElementById('messages');
+  const now = new Date();
+  const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  const sent = document.createElement('div');
+  sent.className = 'msg sent';
+  sent.innerHTML = `<div class="bubble">${text}</div><div class="time">Sen · ${time}</div>`;
+  msgs.appendChild(sent);
+  input.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  setTimeout(() => {
+    const r = replies[currentUser.name];
+    const reply = r[replyIdx[currentUser.name] % r.length];
+    replyIdx[currentUser.name]++;
+    const recv = document.createElement('div');
+    recv.className = 'msg recv';
+    recv.innerHTML = `<div class="bubble">${reply}</div><div class="time">${currentUser.name} · ${time}</div>`;
+    msgs.appendChild(recv);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 800 + Math.random() * 600);
+}
+</script>
+</body>
+</html>
