@@ -1,3 +1,19 @@
+<div align="center">
+
+# ☁ DarkCloud MEGA
+
+**`ESP32 Tabanlı Offline WiFi Messenger · Deneyap Kart · İnternetsiz`**
+
+<br>
+
+[![Live Demo](https://img.shields.io/badge/🌐_Canlı_Demo-GitHub_Pages-1f6feb?style=for-the-badge)](https://eren-oztk.github.io/DarkCloud-MEGA)
+[![Language](https://img.shields.io/badge/C++-100%25-00599C?style=for-the-badge&logo=cplusplus)](https://github.com/Eren-Oztk/DarkCloud-MEGA)
+[![Platform](https://img.shields.io/badge/ESP32--S3-Deneyap_Kart-red?style=for-the-badge)](https://github.com/Eren-Oztk/DarkCloud-MEGA)
+
+</div>
+
+---
+
 # ☁️ DarkCloud MEGA v6.1
 
 **Deneyap Kart (ESP32-S3) üzerinde çalışan yerel ağ mesajlaşma ve dosya paylaşım sistemi.**
